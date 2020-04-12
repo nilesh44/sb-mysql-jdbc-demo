@@ -1,14 +1,11 @@
 package com.ace.config;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Scope;
 import org.springframework.core.annotation.Order;
 
-import com.zaxxer.hikari.HikariConfig;
-import com.zaxxer.hikari.HikariDataSource;
 //this annotation will scan all the @Bean  and create a spring bean for that in spring context
 @Configuration
 public class ApplicationBean {
@@ -35,27 +32,5 @@ public class ApplicationBean {
 				getDbProperties().getUser(), getDbProperties().getPassword());
 	}
 	
-	@Bean("HikariDataSource")
-	@DependsOn("HikariConfig")
-	@Scope("singleton")
-	public HikariDataSource getHikariDataSource() {
-		return new HikariDataSource(getHikariConfig());
-		
-	}
 	
-	@Bean("HikariConfig")
-	@DependsOn("DbProperties")
-	@Scope("singleton")
-	public HikariConfig getHikariConfig() {
-		HikariConfig config = new HikariConfig();
-		config.setDriverClassName(getDbProperties().getDriverClass());
-		config.setJdbcUrl(getDbProperties().getUrl());
-        config.setUsername(getDbProperties().getUser());
-        config.setPassword(getDbProperties().getPassword());
-        config.addDataSourceProperty("cachePrepStmts", "true");
-        config.addDataSourceProperty("prepStmtCacheSize", "250");
-        config.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
-       
-		return config;
-	}
 }

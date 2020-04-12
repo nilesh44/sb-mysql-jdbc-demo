@@ -1,6 +1,7 @@
 package com.ace.controller;
 
 import java.math.BigDecimal;
+
 import java.math.BigInteger;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -15,7 +16,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.ace.config.DatabaseConfiguation;
 import com.ace.config.DbProperties;
 import com.ace.entity.Employee;
-import com.zaxxer.hikari.HikariDataSource;
 
 @RestController
 public class TestController {
@@ -27,9 +27,6 @@ public class TestController {
 	@Qualifier("DatabaseConfiguation")
 	DatabaseConfiguation  databaseConfiguation;
 	
-	@Autowired
-	@Qualifier("HikariDataSource")
-	HikariDataSource hikariDataSource;
 	
 	@GetMapping("/test")
 	public String test() {
@@ -41,7 +38,7 @@ public class TestController {
 		//try with resources example
 		//try(Connection connection= databaseConfiguation.getConnection()) {
 		try {
-			connection= hikariDataSource.getConnection();
+			 connection= databaseConfiguation.getConnection();
 			PreparedStatement preparedStatement=	connection.prepareStatement(sql);
 			preparedStatement.setBigDecimal(1, BigDecimal.valueOf(1));
 			ResultSet resultset=preparedStatement.executeQuery();
@@ -58,7 +55,8 @@ public class TestController {
 		}
 		//good practice
 		
-		//every connection need to be closed after the query is executed successfuly
+		//every connection need to be closed after the query is executed successfuly(if we use direct jdbc )
+		//(if we are using connection pooling then we need not to close the connection it was managed by the connection pooling third party jar)
 		//if we will use try with resources then there is no need to write the finally block
 		//try with resources will automatically close the connection after try or catch block executed
 		
@@ -74,7 +72,6 @@ public class TestController {
             }
         }
 		return "successful";
-		//return dbProperties.getUrl();
 	}
 	
 }
