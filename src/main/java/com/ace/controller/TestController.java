@@ -10,68 +10,43 @@ import java.sql.SQLException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ace.config.DatabaseConfiguation;
 import com.ace.config.DbProperties;
 import com.ace.entity.Employee;
+import com.ace.service.EmployeeService;
 
 @RestController
 public class TestController {
 
 	@Autowired
-	 DbProperties dbProperties;
+	private EmployeeService employeeService;
 	
-	@Autowired 
-	@Qualifier("DatabaseConfiguation")
-	DatabaseConfiguation  databaseConfiguation;
+	//example of using requestparam
+	//http://localhost:8080/test?emp_id=10
 	
+	  @GetMapping("/test") public ResponseEntity<Object> test(@RequestParam
+	  BigInteger emp_id) {
+	  
+	  return employeeService.findByEmpId(emp_id);
+	  
+	  }
+	 
+	  //example of PathVariable
 	
-	@GetMapping("/test")
-	public String test() {
-		Employee employee= new Employee();
-		String sql="select * from employee where emp_id=?";
-		//try with resources
-		//Connection connection= databaseConfiguation.getConnection();
-		Connection connection=null;
-		//try with resources example
-		//try(Connection connection= databaseConfiguation.getConnection()) {
-		try {
-			 connection= databaseConfiguation.getConnection();
-			PreparedStatement preparedStatement=	connection.prepareStatement(sql);
-			preparedStatement.setBigDecimal(1, BigDecimal.valueOf(1));
-			ResultSet resultset=preparedStatement.executeQuery();
-			while(resultset.next()) {
-			employee.setEmpId(resultset.getBigDecimal("emp_id").toBigInteger());
-			employee.setEmpFn(resultset.getString("emp_fn"));
-			employee.setEmpLn(resultset.getString("emp_ln"));
-				
-			}
-			System.out.println(employee);
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		//good practice
-		
-		//every connection need to be closed after the query is executed successfuly(if we use direct jdbc )
-		//(if we are using connection pooling then we need not to close the connection it was managed by the connection pooling third party jar)
-		//if we will use try with resources then there is no need to write the finally block
-		//try with resources will automatically close the connection after try or catch block executed
-		
-		finally {
-            try
-            {
-                if(connection != null)
-                	System.out.println(" THREAD NAME  "+Thread.currentThread().getName());
-                    connection.close();
-                System.out.println("Connection closed !!");
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
-		return "successful";
-	}
+	//http://localhost:8080/test/1
+	/*
+	 * @GetMapping("/test/{emp_id}") public ResponseEntity<Object>
+	 * test(@PathVariable BigInteger emp_id) {
+	 * 
+	 * return employeeService.findByEmpId(emp_id);
+	 * 
+	 * }
+	 */
 	
 }
