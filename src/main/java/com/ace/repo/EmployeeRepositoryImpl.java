@@ -25,7 +25,7 @@ public class EmployeeRepositoryImpl implements EmployeeRepository {
     private DatabaseConfiguation  databaseConfiguation;
 	
 	@Override
-	public Employee findByEmpId(BigInteger bigInteger) {
+	public Employee findByEmpId(BigInteger empId) {
 		Employee employee= new Employee();
 		String sql="select * from employee where emp_id=?";
 		//try with resources
@@ -36,7 +36,7 @@ public class EmployeeRepositoryImpl implements EmployeeRepository {
 		try {
 			 connection= databaseConfiguation.getConnection();
 			PreparedStatement preparedStatement=	connection.prepareStatement(sql);
-			preparedStatement.setBigDecimal(1, BigDecimal.valueOf(1));
+			preparedStatement.setBigDecimal(1, BigDecimal.valueOf(empId.longValue()));
 			ResultSet resultset=preparedStatement.executeQuery();
 			while(resultset.next()) {
 			employee.setEmpId(resultset.getBigDecimal("emp_id").toBigInteger());
@@ -68,6 +68,13 @@ public class EmployeeRepositoryImpl implements EmployeeRepository {
                 e.printStackTrace();
             }
         }
+		
+		if(employee.getEmpId()==null)
+		{
+		return null;
+		
+		
+		}
 		return employee;
 	}
 
